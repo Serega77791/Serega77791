@@ -1,0 +1,37 @@
+import telebot
+import requests
+from django.template.defaultfilters import lower
+
+city = 'Таганрог'
+url = ('https://api.openweathermap.org/data/2.5/weather?q='+city+
+'&units=metric&lang=ru&appid=79d1ca96933b0328e1c7e3e7a26cb347')
+
+from config import token
+
+mybot = telebot.TeleBot(token)
+
+@mybot.message_handler(commands=['start'])
+def start_mess(message):
+    mybot.send_message(message.chat.id, 'Привет Катя, как дела ?!!!')
+
+@mybot.message_handler(content_types=['voice'])
+def voice_mess(message):
+    mybot.send_message(message.chat.id, 'Я ненавижу голосовые сообщения')
+
+@mybot.message_handler(commands=[lower('Погода')])
+def start_mess(message):
+
+
+    city = 'Таганрог'
+    url = ('https://api.openweathermap.org/data/2.5/weather?q='+city+
+    '&units=metric&lang=ru&appid=79d1ca96933b0328e1c7e3e7a26cb347')
+    weather_data = requests.get(url).json()
+
+    temperature = round(weather_data['main']['temp'])
+    temperature_feels = round(weather_data['main']['feels_like'])
+
+    weather_string = ('Сейчас в городе ' + city + ' ' + str(temperature) + '°C  Ощущается как ' + str(temperature_feels) + '°C')
+
+    mybot.send_message(message.chat.id, weather_string)
+
+mybot.infinity_polling()
